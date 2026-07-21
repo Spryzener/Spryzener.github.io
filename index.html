@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Foidslayer24</title>
 
-<!-- 🖼️ ИКОНКА ВКЛАДКИ (Favicon) -->
 <link rel="icon" type="image/gif" href="av.gif">
 
-<!-- 🏷️ МЕТАТЕГИ ДЛЯ ПРЕВЬЮ В СОЦСЕТЯХ (Discord, Telegram и др.) -->
 <meta property="og:title" content="Foidslayer24">
 <meta property="og:description" content="links & socials;))">
 <meta property="og:image" content="https://spryzener.github.io/av.gif">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#9b5cff">
 
-<!-- 🖼️ БОЛЬШОЕ ПРЕВЬЮ (для Discord и Twitter) -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Foidslayer24">
 <meta name="twitter:description" content="links & socials;))">
@@ -23,7 +20,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Подключаем стандартный и готический шрифт (UnifrakturMaguntia) -->
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
 <style>
@@ -38,7 +34,6 @@
     --row-bg: rgba(60, 32, 110, 0.45);
     --row-bg-hover: rgba(80, 42, 150, 0.6);
     
-    /* Дефолтный цвет статуса (серый до загрузки) */
     --status-color: #747f8d;
   }
 
@@ -86,7 +81,6 @@
     flex-wrap: wrap;
   }
 
-  /* 🖼️ АВАТАРКА */
   .avatar{
     width: 56px;
     height: 56px;
@@ -142,7 +136,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* Динамический статус плашки */
   .status-chip{
     display: inline-flex;
     align-items: center;
@@ -215,7 +208,6 @@
     transform: translateY(-2px);
   }
 
-  /* Блок векторной иконки */
   .link-icon{
     width: 36px;
     height: 36px;
@@ -253,7 +245,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* Модалка ввода кода */
   .overlay{
     position: fixed;
     inset: 0;
@@ -295,7 +286,6 @@
 
   .modal input:focus{ border-color: var(--accent); }
 
-  /* Плейсхолдер скрывается при фокусе на инпут */
   .modal input:focus::placeholder{
     color: transparent;
   }
@@ -444,7 +434,6 @@
   </div>
 
 <script>
-  // 🆔 ТВОЙ DISCORD ID (замени числа на свои)
   const DISCORD_ID = '505088405345140756';
 
   const overlay = document.getElementById('overlay');
@@ -453,7 +442,6 @@
   const confirmBtn = document.getElementById('confirmBtn');
   const codeInput = document.getElementById('codeInput');
 
-  // URL твоего удалённого сервера
   const API_URL = 'https://passcode.dog945n.workers.dev/';
 
   avatarBtn.addEventListener('click', () => {
@@ -540,7 +528,6 @@
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      // Opcode 1: Hello -> Отправляем Heartbeat и подписываемся на ID
       if (data.op === 1) {
         heartbeatInterval = setInterval(() => {
           ws.send(JSON.stringify({ op: 3 }));
@@ -552,7 +539,6 @@
         }));
       }
 
-      // Opcode 0: Событие изменения данных (INIT_STATE или PRESENCE_UPDATE)
       if (data.op === 0) {
         const presence = data.d;
         if (presence && presence.discord_status) {
@@ -563,7 +549,6 @@
 
     ws.onclose = () => {
       clearInterval(heartbeatInterval);
-      // Авто-переподключение при обрыве связи через 5 секунд
       setTimeout(initLanyardWebSocket, 5000);
     };
 
