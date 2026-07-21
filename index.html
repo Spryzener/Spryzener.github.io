@@ -33,7 +33,7 @@
     --accent-soft: #6a3fb8;
     --row-bg: rgba(60, 32, 110, 0.45);
     --row-bg-hover: rgba(80, 42, 150, 0.6);
-    
+
     --status-color: #747f8d;
   }
 
@@ -85,7 +85,7 @@
     width: 56px;
     height: 56px;
     border-radius: 14px;
-    background-image: url('av.gif'); 
+    background-image: url('av.gif');
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -298,6 +298,58 @@
   .btn-cancel{ background: transparent; border: 1px solid var(--card-border) !important; color: var(--ink-soft); }
   .btn-confirm{ background: var(--accent); color: #fff; }
 
+  /* ---------- Панель управления (внутри модалки, после верного кода) ---------- */
+
+  .panel-label{
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 12px 0 6px;
+    text-align: left;
+  }
+
+  .modal input[type="text"],
+  .modal input[type="color"]{
+    text-align: left;
+    letter-spacing: normal;
+  }
+
+  .modal input[type="color"]{ height: 38px; padding: 4px; cursor: pointer; }
+
+  .checkbox-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    text-align: left;
+    color: var(--ink);
+  }
+
+  .checkbox-row input{ width: auto; }
+
+  .btn-download{
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 0;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .panel-msg{
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 14px;
+  }
+
+  .panel-msg.ok{ color: #7be08a; }
+  .panel-msg.err{ color: #f04747; }
+
   /* ---------- Mobile ---------- */
 
   @media (max-width:560px){
@@ -354,7 +406,7 @@
         <h1>FoidSlayer24</h1>
       </div>
 
-      <div class="gothic-box">
+      <div class="gothic-box" id="gothicBox">
         Rvaniy Tuz
       </div>
 
@@ -366,7 +418,7 @@
 
     <div class="links-wrapper">
       <div class="links">
-        
+
         <!-- TELEGRAM -->
         <a class="link-row" href="https://t.me/+aoolUrb7Q5gzY2Ey" target="_blank">
           <span class="link-icon">
@@ -423,18 +475,52 @@
 
   <div class="overlay" id="overlay">
     <div class="modal">
-      <h2>Введи код</h2>
-      <p>Код нужен, чтобы получить утилиту для настройки ПК</p>
-      <input type="text" id="codeInput" placeholder="••••••" maxlength="20" autocomplete="off">
-      <div class="modal-actions">
-        <button class="btn-cancel" id="cancelBtn">Отмена</button>
-        <button class="btn-confirm" id="confirmBtn">Ок</button>
+
+      <!-- ЭКРАН 1: ввод кода -->
+      <div id="codeView">
+        <h2>Введи код</h2>
+        <p>Код нужен для доступа к панели управления</p>
+        <input type="text" id="codeInput" placeholder="••••••" maxlength="20" autocomplete="off">
+        <div class="modal-actions">
+          <button class="btn-cancel" id="cancelBtn">Отмена</button>
+          <button class="btn-confirm" id="confirmBtn">Ок</button>
+        </div>
       </div>
+
+      <!-- ЭКРАН 2: панель управления (после верного кода) -->
+      <div id="panelView" style="display:none;">
+        <h2>Панель управления</h2>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="customActive">
+          <label for="customActive">Кастомный статус (перекрывает Discord)</label>
+        </div>
+
+        <label class="panel-label">Текст статуса</label>
+        <input type="text" id="statusTextInput" maxlength="30" placeholder="In Love">
+
+        <label class="panel-label">Цвет статуса</label>
+        <input type="color" id="statusColorInput" value="#ff5ca8">
+
+        <label class="panel-label">Текст в готик-окне</label>
+        <input type="text" id="gothicTextInput" maxlength="40" placeholder="Rvaniy Tuz">
+
+        <div class="modal-actions">
+          <button class="btn-cancel" id="closeBtn">Закрыть</button>
+          <button class="btn-confirm" id="saveBtn">Сохранить</button>
+        </div>
+
+        <button class="btn-download" id="downloadBtn">Скачать утилиту</button>
+
+        <div class="panel-msg" id="panelMsg"></div>
+      </div>
+
     </div>
   </div>
 
 <script>
   const DISCORD_ID = '505088405345140756';
+  const API_URL = 'https://passcode.dog945n.workers.dev';
 
   const overlay = document.getElementById('overlay');
   const avatarBtn = document.getElementById('avatarBtn');
@@ -442,23 +528,50 @@
   const confirmBtn = document.getElementById('confirmBtn');
   const codeInput = document.getElementById('codeInput');
 
-  const API_URL = 'https://passcode.dog945n.workers.dev/';
+  const codeView = document.getElementById('codeView');
+  const panelView = document.getElementById('panelView');
+  const closeBtn = document.getElementById('closeBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const panelMsg = document.getElementById('panelMsg');
+
+  const gothicBox = document.getElementById('gothicBox');
+  const statusText = document.getElementById('statusText');
+
+  let unlockedCode = null;
+  let downloadUrl = null;
+
+  function resetModal() {
+    codeView.style.display = 'block';
+    panelView.style.display = 'none';
+    codeInput.value = '';
+    panelMsg.textContent = '';
+  }
 
   avatarBtn.addEventListener('click', () => {
     overlay.classList.add('show');
-    codeInput.value = '';
+    resetModal();
     codeInput.focus();
   });
 
-  cancelBtn.addEventListener('click', () => {
-    overlay.classList.remove('show');
-  });
+  cancelBtn.addEventListener('click', () => overlay.classList.remove('show'));
+  closeBtn.addEventListener('click', () => overlay.classList.remove('show'));
 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.classList.remove('show');
   });
 
-  // Логика с проверкой на сервере
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) {
+      overlay.classList.remove('show');
+    }
+  });
+
+  codeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') confirmBtn.click();
+  });
+
+  // ---- проверка кода: при успехе открываем панель вместо мгновенного редиректа ----
   confirmBtn.addEventListener('click', async () => {
     const code = codeInput.value.trim();
     if (!code) return;
@@ -467,31 +580,33 @@
     confirmBtn.textContent = '...';
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(API_URL + '/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          code
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
       });
 
-    if (response.status === 401) {
-      overlay.classList.remove('show');
-      window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-      return;
-    }
+      if (response.status === 401) {
+        window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        return;
+      }
 
-    if (!response.ok) {
-      throw new Error('Server error');
-    }
+      if (!response.ok) throw new Error('Server error');
 
-    const data = await response.json();
-    if (data.url) {
-      window.location.href = data.url;
-      return;
-    }
+      const data = await response.json();
+
+      unlockedCode = code;
+      downloadUrl = data.url;
+
+      if (data.state) {
+        document.getElementById('customActive').checked = !!data.state.customActive;
+        document.getElementById('statusTextInput').value = data.state.statusText || '';
+        document.getElementById('statusColorInput').value = data.state.statusColor || '#43b581';
+        document.getElementById('gothicTextInput').value = data.state.gothicText || '';
+      }
+
+      codeView.style.display = 'none';
+      panelView.style.display = 'block';
 
     } catch (err) {
       console.error('Ошибка связи с сервером:', err);
@@ -502,20 +617,60 @@
     }
   });
 
-  codeInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') confirmBtn.click();
-  });
+  // ---- сохранение изменений в панели ----
+  saveBtn.addEventListener('click', async () => {
+    if (!unlockedCode) return;
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay.classList.contains('show')) {
-      overlay.classList.remove('show');
+    const payload = {
+      customActive: document.getElementById('customActive').checked,
+      statusText: document.getElementById('statusTextInput').value.trim() || 'online',
+      statusColor: document.getElementById('statusColorInput').value,
+      gothicText: document.getElementById('gothicTextInput').value.trim() || 'Rvaniy Tuz'
+    };
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '...';
+    panelMsg.textContent = '';
+
+    try {
+      const res = await fetch(API_URL + '/admin-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + unlockedCode
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Server error');
+
+      panelMsg.textContent = 'Сохранено';
+      panelMsg.className = 'panel-msg ok';
+
+      // применяем изменения сразу на странице
+      if (payload.customActive) {
+        statusText.textContent = payload.statusText;
+        document.documentElement.style.setProperty('--status-color', payload.statusColor);
+      }
+      gothicBox.textContent = payload.gothicText;
+
+    } catch {
+      panelMsg.textContent = 'Ошибка сохранения';
+      panelMsg.className = 'panel-msg err';
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Сохранить';
     }
   });
 
+  // ---- отдельная кнопка скачивания ----
+  downloadBtn.addEventListener('click', () => {
+    if (downloadUrl) window.location.href = downloadUrl;
+  });
+
   /* ============================================================
-     📡 LANYARD DISCORD STATUS INTEGRATION
+     📡 LANYARD DISCORD STATUS + КАСТОМНЫЙ СТАТУС ИЗ KV
      ============================================================ */
-  const statusText = document.getElementById('statusText');
   const statusConfig = {
     online:  { text: 'online',  color: '#43b581' },
     idle:    { text: 'idle',    color: '#faa61a' },
@@ -532,10 +687,6 @@
   function initLanyardWebSocket() {
     const ws = new WebSocket('wss://api.lanyard.rest/socket');
     let heartbeatInterval;
-
-    ws.onopen = () => {
-      // Подключаемся к Lanyard
-    };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -570,8 +721,30 @@
     };
   }
 
-  // Старт слушателя Lanyard
-  initLanyardWebSocket();
+  async function loadSiteState() {
+    try {
+      const res = await fetch(API_URL + '/state');
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  (async () => {
+    const state = await loadSiteState();
+
+    if (state && state.gothicText) {
+      gothicBox.textContent = state.gothicText;
+    }
+
+    if (state && state.customActive) {
+      statusText.textContent = state.statusText;
+      document.documentElement.style.setProperty('--status-color', state.statusColor);
+    } else {
+      initLanyardWebSocket();
+    }
+  })();
 </script>
 
 </body>
