@@ -469,18 +469,29 @@
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code
+        })
       });
 
-      const data = await response.json();
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
 
-      if (data.success && data.downloadUrl) {
-        window.location.href = data.downloadUrl;
-      } else {
+      if (response.status === 401) {
         overlay.classList.remove('show');
         window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        return;
       }
+
+      if (!response.ok) {
+        throw new Error('Server error');
+      }
+
     } catch (err) {
       console.error('Ошибка связи с сервером:', err);
       alert('Ошибка при проверке кода. Попробуй позже.');
