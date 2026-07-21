@@ -477,20 +477,21 @@
         })
       });
 
-      if (response.redirected) {
-        window.location.href = response.url;
-        return;
-      }
+    if (response.status === 401) {
+      overlay.classList.remove('show');
+      window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      return;
+    }
 
-      if (response.status === 401) {
-        overlay.classList.remove('show');
-        window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-        return;
-      }
+    if (!response.ok) {
+      throw new Error('Server error');
+    }
 
-      if (!response.ok) {
-        throw new Error('Server error');
-      }
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
 
     } catch (err) {
       console.error('Ошибка связи с сервером:', err);
