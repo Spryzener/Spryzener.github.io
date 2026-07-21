@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Foidslayer24</title>
 
+<!-- 🖼️ ИКОНКА ВКЛАДКИ (Favicon) -->
 <link rel="icon" type="image/gif" href="av.gif">
 
-<!-- Open Graph -->
+<!-- 🏷️ МЕТАТЕГИ ДЛЯ ПРЕВЬЮ В СОЦСЕТЯХ (Discord, Telegram и др.) -->
 <meta property="og:title" content="Foidslayer24">
 <meta property="og:description" content="Утилиты, ссылки и соцсети">
 <meta property="og:image" content="av.gif">
@@ -16,10 +17,11 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Подключаем стандартный и готический шрифт (UnifrakturMaguntia) -->
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
 <style>
-  :root {
+  :root{
     --bg: #120a24;
     --card: rgba(30, 16, 56, 0.72);
     --card-border: rgba(160, 110, 255, 0.35);
@@ -31,14 +33,14 @@
     --row-bg-hover: rgba(80, 42, 150, 0.6);
   }
 
-  * { box-sizing: border-box; }
+  *{ box-sizing: border-box; }
 
-  html, body {
+  html, body{
     height: 100%;
     margin: 0;
   }
 
-  body {
+  body{
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     background-image: url('bg.gif');
@@ -46,13 +48,14 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
+
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--ink);
   }
 
-  .window {
+  .window{
     width: min(520px, 92vw);
     max-height: 86vh;
     background: var(--card);
@@ -71,9 +74,11 @@
     align-items: center;
     gap: 12px;
     padding: 22px 22px 18px;
+    flex-wrap: wrap;
   }
 
-  .avatar {
+  /* 🖼️ АВАТАРКА */
+  .avatar{
     width: 56px;
     height: 56px;
     border-radius: 14px;
@@ -82,6 +87,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-color: var(--accent-soft);
+
     flex-shrink: 0;
     cursor: pointer;
     border: 1px solid var(--card-border);
@@ -95,12 +101,18 @@
     overflow: hidden;
   }
 
-  .avatar:hover {
+  .avatar:hover{
     transform: scale(1.04);
     box-shadow: 0 6px 20px rgba(155, 92, 255, 0.5);
   }
 
-  .name-block h1 {
+  .name-block{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .name-block h1{
     margin: 0;
     font-size: 18px;
     color: var(--ink);
@@ -108,7 +120,7 @@
     letter-spacing: 1px;
   }
 
-  .gothic-box {
+  .gothic-box{
     font-family: 'UnifrakturMaguntia', cursive;
     font-size: 16px;
     color: var(--ink);
@@ -121,7 +133,7 @@
     letter-spacing: 0.5px;
   }
 
-  .status-chip {
+  .status-chip{
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -136,7 +148,7 @@
     white-space: nowrap;
   }
 
-  .status-chip .dot {
+  .status-chip .dot{
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -145,12 +157,12 @@
     animation: blink 1.4s infinite;
   }
 
-  @keyframes blink {
+  @keyframes blink{
     0%, 100% { opacity: 1; }
     50% { opacity: 0.25; }
   }
 
-  .links-wrapper {
+  .links-wrapper{
     margin: 0 18px 20px;
     border: 1px solid var(--card-border);
     border-radius: 18px;
@@ -159,7 +171,7 @@
     overflow: hidden;
   }
 
-  .links {
+  .links{
     max-height: 280px;
     padding: 14px;
     overflow-y: auto;
@@ -168,11 +180,11 @@
     gap: 12px;
   }
 
-  .links::-webkit-scrollbar { width: 8px; }
-  .links::-webkit-scrollbar-thumb { background: var(--accent-soft); border-radius: 8px; }
-  .links::-webkit-scrollbar-track { background: transparent; }
+  .links::-webkit-scrollbar{ width: 8px; }
+  .links::-webkit-scrollbar-thumb{ background: var(--accent-soft); border-radius: 8px; }
+  .links::-webkit-scrollbar-track{ background: transparent; }
 
-  .link-row {
+  .link-row{
     display: flex;
     align-items: center;
     gap: 14px;
@@ -185,13 +197,14 @@
     transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
   }
 
-  .link-row:hover {
+  .link-row:hover{
     background: var(--row-bg-hover);
     border-color: var(--accent);
     transform: translateY(-2px);
   }
 
-  .link-icon {
+  /* Блок векторной иконки */
+  .link-icon{
     width: 36px;
     height: 36px;
     border-radius: 10px;
@@ -204,7 +217,7 @@
     transition: background 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .link-row:hover .link-icon {
+  .link-row:hover .link-icon{
     background: rgba(155, 92, 255, 0.4);
     box-shadow: 0 0 10px rgba(155, 92, 255, 0.4);
   }
@@ -221,14 +234,15 @@
     transform: scale(1.1);
   }
 
-  .link-text {
+  .link-text{
     font-size: 14px;
     font-weight: 500;
     font-family: 'Share Tech Mono', monospace;
     letter-spacing: 0.5px;
   }
 
-  .overlay {
+  /* Модалка ввода кода */
+  .overlay{
     position: fixed;
     inset: 0;
     background: rgba(8, 4, 20, 0.55);
@@ -238,9 +252,9 @@
     z-index: 10;
   }
 
-  .overlay.show { display: flex; }
+  .overlay.show{ display: flex; }
 
-  .modal {
+  .modal{
     width: min(340px, 88vw);
     background: rgba(24, 12, 46, 0.92);
     border: 1px solid var(--card-border);
@@ -251,10 +265,10 @@
     backdrop-filter: blur(10px);
   }
 
-  .modal h2 { margin: 0 0 6px; font-size: 17px; color: var(--ink); }
-  .modal p { margin: 0 0 16px; font-size: 13px; color: var(--ink-soft); }
+  .modal h2{ margin: 0 0 6px; font-size: 17px; color: var(--ink); }
+  .modal p{ margin: 0 0 16px; font-size: 13px; color: var(--ink-soft); }
 
-  .modal input {
+  .modal input{
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
@@ -267,16 +281,65 @@
     outline: none;
   }
 
-  .modal input:focus { border-color: var(--accent); }
-  .modal input:focus::placeholder { color: transparent; }
+  .modal input:focus{ border-color: var(--accent); }
 
-  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
-  .modal-actions button {
+  /* Плейсхолдер скрывается при фокусе на инпут */
+  .modal input:focus::placeholder{
+    color: transparent;
+  }
+
+  .modal-actions{ display: flex; gap: 10px; margin-top: 16px; }
+  .modal-actions button{
     flex: 1; padding: 9px 0; border-radius: 10px; border: none; font-size: 13px; cursor: pointer;
   }
 
-  .btn-cancel { background: transparent; border: 1px solid var(--card-border) !important; color: var(--ink-soft); }
-  .btn-confirm { background: var(--accent); color: #fff; }
+  .btn-cancel{ background: transparent; border: 1px solid var(--card-border) !important; color: var(--ink-soft); }
+  .btn-confirm{ background: var(--accent); color: #fff; }
+
+  /* ---------- Mobile ---------- */
+
+  @media (max-width:560px){
+
+    .header{
+      gap:10px;
+    }
+
+    .gothic-box{
+      order:2;
+      margin-left:68px;
+    }
+
+    .status-chip{
+      order:3;
+      margin-left:68px;
+      margin-top:-6px;
+      width:auto;
+    }
+
+  }
+
+  @media (max-width:420px){
+
+    .header{
+      padding:18px;
+    }
+
+    .name-block h1{
+      font-size:16px;
+    }
+
+    .gothic-box{
+      font-size:14px;
+      margin-left:68px;
+    }
+
+    .status-chip{
+      font-size:11px;
+      padding:5px 10px;
+      margin-left:68px;
+    }
+
+  }
 </style>
 </head>
 <body>
@@ -302,6 +365,7 @@
     <div class="links-wrapper">
       <div class="links">
         
+        <!-- TELEGRAM -->
         <a class="link-row" href="https://t.me/+aoolUrb7Q5gzY2Ey" target="_blank">
           <span class="link-icon">
             <svg viewBox="0 0 24 24">
@@ -311,6 +375,7 @@
           <span class="link-text">Telegram Channel</span>
         </a>
 
+        <!-- INSTAGRAM -->
         <a class="link-row" href="https://instagram.com/foidslayer25" target="_blank">
           <span class="link-icon">
             <svg viewBox="0 0 24 24">
@@ -320,6 +385,7 @@
           <span class="link-text">Instagram</span>
         </a>
 
+        <!-- TIKTOK -->
         <a class="link-row" href="https://tiktok.com/@foidslayer24" target="_blank">
           <span class="link-icon">
             <svg viewBox="0 0 24 24">
@@ -329,15 +395,17 @@
           <span class="link-text">TikTok</span>
         </a>
 
+        <!-- SOUNDCLOUD -->
         <a class="link-row" href="https://soundcloud.com/dima-foidslayer" target="_blank">
-          <span class="link-icon">
+        <span class="link-icon">
             <svg viewBox="0 0 24 24">
-              <path d="M23.999 14.161c-.12 1.848-1.632 3.321-3.518 3.321h-7.234a.735.735 0 0 1-.735-.735V8.125a.732.732 0 0 1 .593-.72 4.793 4.793 0 0 1 .982-.102 4.764 4.764 0 0 1 4.331 2.825 3.517 3.517 0 0 1 2.115-.705c1.97 0 3.568 1.6 3.568 3.57 0 .399-.071.782-.202 1.168zM1.01 12.56a.735.735 0 0 0-.735.735v2.851a.735.735 0 1 0 1.47 0v-2.851a.735.735 0 0 0-.735-.735zm1.96-1.002a.735.735 0 0 0-.735.735v4.855a.735.735 0 1 0 1.47 0v-4.855a.735.735 0 0 0-.735-.735zm1.96-1.571a.735.735 0 0 0-.735.735v8a.735.735 0 1 0 1.47 0v-8a.735.735 0 0 0-.735-.735zm1.96-.867a.735.735 0 0 0-.735.735v9.734a.735.735 0 1 0 1.47 0V9.855a.735.735 0 0 0-.735-.735zm1.96 1.002a.735.735 0 0 0-.735.735v7.73a.735.735 0 1 0 1.47 0v-7.73a.735.735 0 0 0-.735-.735z"/>
+            <path d="M23.999 14.161c-.12 1.848-1.632 3.321-3.518 3.321h-7.234a.735.735 0 0 1-.735-.735V8.125a.732.732 0 0 1 .593-.72 4.793 4.793 0 0 1 .982-.102 4.764 4.764 0 0 1 4.331 2.825 3.517 3.517 0 0 1 2.115-.705c1.97 0 3.568 1.6 3.568 3.57 0 .399-.071.782-.202 1.168zM1.01 12.56a.735.735 0 0 0-.735.735v2.851a.735.735 0 1 0 1.47 0v-2.851a.735.735 0 0 0-.735-.735zm1.96-1.002a.735.735 0 0 0-.735.735v4.855a.735.735 0 1 0 1.47 0v-4.855a.735.735 0 0 0-.735-.735zm1.96-1.571a.735.735 0 0 0-.735.735v8a.735.735 0 1 0 1.47 0v-8a.735.735 0 0 0-.735-.735zm1.96-.867a.735.735 0 0 0-.735.735v9.734a.735.735 0 1 0 1.47 0V9.855a.735.735 0 0 0-.735-.735zm1.96 1.002a.735.735 0 0 0-.735.735v7.73a.735.735 0 1 0 1.47 0v-7.73a.735.735 0 0 0-.735-.735z"/>
             </svg>
-          </span>
-          <span class="link-text">SoundCloud</span>
+        </span>
+        <span class="link-text">SoundCloud</span>
         </a>
 
+        <!-- GITHUB -->
         <a class="link-row" href="https://github.com/spryzener" target="_blank">
           <span class="link-icon">
             <svg viewBox="0 0 24 24">
@@ -364,13 +432,14 @@
   </div>
 
 <script>
-  const overlay = document.getElementById('overlay');
+const overlay = document.getElementById('overlay');
   const avatarBtn = document.getElementById('avatarBtn');
   const cancelBtn = document.getElementById('cancelBtn');
   const confirmBtn = document.getElementById('confirmBtn');
   const codeInput = document.getElementById('codeInput');
 
-  const API_URL = 'https://passcode.dog945n.workers.dev/';
+  // URL твоего удалённого сервера (замени на свой)
+    const API_URL = 'https://passcode.dog945n.workers.dev/';
 
   avatarBtn.addEventListener('click', () => {
     overlay.classList.add('show');
@@ -386,10 +455,12 @@
     if (e.target === overlay) overlay.classList.remove('show');
   });
 
+  // Логика с проверкой на сервере
   confirmBtn.addEventListener('click', async () => {
     const code = codeInput.value.trim();
     if (!code) return;
 
+    // Запрещаем повторные клики пока идет запрос
     confirmBtn.disabled = true;
     confirmBtn.textContent = '...';
 
@@ -403,14 +474,16 @@
       const data = await response.json();
 
       if (data.success && data.downloadUrl) {
+        // Код верный — редирект на скачивание
         window.location.href = data.downloadUrl;
       } else {
+        // Код неверный — закрываем окно и рикроллим
         overlay.classList.remove('show');
         window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
       }
     } catch (err) {
-      console.error('Network error:', err);
-      alert('Ошибка соединения с сервером');
+      console.error('Ошибка связи с сервером:', err);
+      alert('Ошибка при проверке кода. Попробуй позже.');
     } finally {
       confirmBtn.disabled = false;
       confirmBtn.textContent = 'Ок';
