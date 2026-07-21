@@ -519,7 +519,6 @@
   </div>
 
 <script>
-  const DISCORD_ID = '505088405345140756';
   const API_URL = 'https://passcode.dog945n.workers.dev';
 
   const overlay = document.getElementById('overlay');
@@ -588,6 +587,11 @@
 
       if (response.status === 401) {
         window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        return;
+      }
+
+      if (response.status === 429) {
+        alert('Слишком много попыток. Подожди немного.');
         return;
       }
 
@@ -669,57 +673,8 @@
   });
 
   /* ============================================================
-     📡 LANYARD DISCORD STATUS + КАСТОМНЫЙ СТАТУС ИЗ KV
+     📡 СТАТУС ЧЕРЕЗ /state (Discord ID скрыт на стороне Worker'а)
      ============================================================ */
-  const statusConfig = {
-    online:  { text: 'online',  color: '#43b581' },
-    idle:    { text: 'idle',    color: '#faa61a' },
-    dnd:     { text: 'dnd',     color: '#f04747' },
-    offline: { text: 'offline', color: '#747f8d' }
-  };
-
-  function updateStatusUI(status) {
-    const info = statusConfig[status] || statusConfig.offline;
-    statusText.textContent = info.text;
-    document.documentElement.style.setProperty('--status-color', info.color);
-  }
-
-  function initLanyardWebSocket() {
-    const ws = new WebSocket('wss://api.lanyard.rest/socket');
-    let heartbeatInterval;
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.op === 1) {
-        heartbeatInterval = setInterval(() => {
-          ws.send(JSON.stringify({ op: 3 }));
-        }, data.d.heartbeat_interval);
-
-        ws.send(JSON.stringify({
-          op: 2,
-          d: { subscribe_to_id: DISCORD_ID }
-        }));
-      }
-
-      if (data.op === 0) {
-        const presence = data.d;
-        if (presence && presence.discord_status) {
-          updateStatusUI(presence.discord_status);
-        }
-      }
-    };
-
-    ws.onclose = () => {
-      clearInterval(heartbeatInterval);
-      setTimeout(initLanyardWebSocket, 5000);
-    };
-
-    ws.onerror = (err) => {
-      console.error('Lanyard WebSocket Error:', err);
-      ws.close();
-    };
-  }
 
   async function loadSiteState() {
     try {
@@ -731,20 +686,20 @@
     }
   }
 
-  (async () => {
+  async function refreshState() {
     const state = await loadSiteState();
+    if (!state) return;
 
-    if (state && state.gothicText) {
+    if (state.gothicText) {
       gothicBox.textContent = state.gothicText;
     }
 
-    if (state && state.customActive) {
-      statusText.textContent = state.statusText;
-      document.documentElement.style.setProperty('--status-color', state.statusColor);
-    } else {
-      initLanyardWebSocket();
-    }
-  })();
+    statusText.textContent = state.statusText;
+    document.documentElement.style.setProperty('--status-color', state.statusColor);
+  }
+
+  refreshState();
+  setInterval(refreshState, 20000);
 </script>
 
 </body>
