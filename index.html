@@ -10,10 +10,16 @@
 
 <!-- 🏷️ МЕТАТЕГИ ДЛЯ ПРЕВЬЮ В СОЦСЕТЯХ (Discord, Telegram и др.) -->
 <meta property="og:title" content="Foidslayer24">
-<meta property="og:description" content="Утилиты, ссылки и соцсети">
-<meta property="og:image" content="av.gif">
+<meta property="og:description" content="links & socials;))">
+<meta property="og:image" content="https://spryzener.github.io/av.gif">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#9b5cff">
+
+<!-- 🖼️ БОЛЬШОЕ ПРЕВЬЮ (для Discord и Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Foidslayer24">
+<meta name="twitter:description" content="links & socials;))">
+<meta name="twitter:image" content="https://spryzener.github.io/av.gif">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +37,9 @@
     --accent-soft: #6a3fb8;
     --row-bg: rgba(60, 32, 110, 0.45);
     --row-bg-hover: rgba(80, 42, 150, 0.6);
+    
+    /* Дефолтный цвет статуса (серый до загрузки) */
+    --status-color: #747f8d;
   }
 
   *{ box-sizing: border-box; }
@@ -133,6 +142,7 @@
     letter-spacing: 0.5px;
   }
 
+  /* Динамический статус плашки */
   .status-chip{
     display: inline-flex;
     align-items: center;
@@ -144,17 +154,19 @@
     background: rgba(10, 5, 24, 0.5);
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
-    color: #7be08a;
+    color: var(--status-color);
     white-space: nowrap;
+    transition: color 0.3s ease;
   }
 
   .status-chip .dot{
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #7be08a;
-    box-shadow: 0 0 6px #7be08a;
+    background: var(--status-color);
+    box-shadow: 0 0 6px var(--status-color);
     animation: blink 1.4s infinite;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
   }
 
   @keyframes blink{
@@ -356,9 +368,9 @@
         Rvaniy Tuz
       </div>
 
-      <div class="status-chip">
+      <div class="status-chip" id="statusChip">
         <span class="dot"></span>
-        <span>online</span>
+        <span id="statusText">loading...</span>
       </div>
     </div>
 
@@ -432,14 +444,17 @@
   </div>
 
 <script>
-const overlay = document.getElementById('overlay');
+  // 🆔 ТВОЙ DISCORD ID (замени числа на свои)
+  const DISCORD_ID = '505088405345140756';
+
+  const overlay = document.getElementById('overlay');
   const avatarBtn = document.getElementById('avatarBtn');
   const cancelBtn = document.getElementById('cancelBtn');
   const confirmBtn = document.getElementById('confirmBtn');
   const codeInput = document.getElementById('codeInput');
 
-  // URL твоего удалённого сервера (замени на свой)
-    const API_URL = 'https://passcode.dog945n.workers.dev/';
+  // URL твоего удалённого сервера
+  const API_URL = 'https://passcode.dog945n.workers.dev/';
 
   avatarBtn.addEventListener('click', () => {
     overlay.classList.add('show');
@@ -460,7 +475,6 @@ const overlay = document.getElementById('overlay');
     const code = codeInput.value.trim();
     if (!code) return;
 
-    // Запрещаем повторные клики пока идет запрос
     confirmBtn.disabled = true;
     confirmBtn.textContent = '...';
 
@@ -474,10 +488,8 @@ const overlay = document.getElementById('overlay');
       const data = await response.json();
 
       if (data.success && data.downloadUrl) {
-        // Код верный — редирект на скачивание
         window.location.href = data.downloadUrl;
       } else {
-        // Код неверный — закрываем окно и рикроллим
         overlay.classList.remove('show');
         window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
       }
@@ -499,6 +511,70 @@ const overlay = document.getElementById('overlay');
       overlay.classList.remove('show');
     }
   });
+
+  /* ============================================================
+     📡 LANYARD DISCORD STATUS INTEGRATION
+     ============================================================ */
+  const statusText = document.getElementById('statusText');
+  const statusConfig = {
+    online:  { text: 'online',  color: '#43b581' },
+    idle:    { text: 'idle',    color: '#faa61a' },
+    dnd:     { text: 'dnd',     color: '#f04747' },
+    offline: { text: 'offline', color: '#747f8d' }
+  };
+
+  function updateStatusUI(status) {
+    const info = statusConfig[status] || statusConfig.offline;
+    statusText.textContent = info.text;
+    document.documentElement.style.setProperty('--status-color', info.color);
+  }
+
+  function initLanyardWebSocket() {
+    const ws = new WebSocket('wss://api.lanyard.rest/socket');
+    let heartbeatInterval;
+
+    ws.onopen = () => {
+      // Подключаемся к Lanyard
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // Opcode 1: Hello -> Отправляем Heartbeat и подписываемся на ID
+      if (data.op === 1) {
+        heartbeatInterval = setInterval(() => {
+          ws.send(JSON.stringify({ op: 3 }));
+        }, data.d.heartbeat_interval);
+
+        ws.send(JSON.stringify({
+          op: 2,
+          d: { subscribe_to_id: DISCORD_ID }
+        }));
+      }
+
+      // Opcode 0: Событие изменения данных (INIT_STATE или PRESENCE_UPDATE)
+      if (data.op === 0) {
+        const presence = data.d;
+        if (presence && presence.discord_status) {
+          updateStatusUI(presence.discord_status);
+        }
+      }
+    };
+
+    ws.onclose = () => {
+      clearInterval(heartbeatInterval);
+      // Авто-переподключение при обрыве связи через 5 секунд
+      setTimeout(initLanyardWebSocket, 5000);
+    };
+
+    ws.onerror = (err) => {
+      console.error('Lanyard WebSocket Error:', err);
+      ws.close();
+    };
+  }
+
+  // Старт слушателя Lanyard
+  initLanyardWebSocket();
 </script>
 
 </body>
